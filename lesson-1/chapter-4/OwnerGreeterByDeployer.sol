@@ -1,4 +1,4 @@
-pragma solidity ^0.4.0;
+pragma solidity >= 0.4.0 < 0.7.0;
 
 contract OwnerGreeterByDeployer {
     string private _greeting = "Hello World!";
