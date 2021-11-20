@@ -56,7 +56,7 @@ class Blockchain {
         let max_length = this.chain.length;
 
         for(let node in neighbours){
-            let response = await axios.get(`http://{node}/blockchain`);
+            let response = await axios.get(`http://${node}/blockchain`);
 
             if(response.status_code === 200){
                 let length = response.data[0].length;
