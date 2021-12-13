@@ -163,7 +163,7 @@ App.get('/mine', async(req, res) => {
     let index = blockchain.chain.length;
 
     let nonce = blockchain.proof_of_work(index, last_block_hash, blockchain.current_transactions);
-    let block = blockchain.append_block(nonce, last_block_hash);
+    let block = blockchain.append_block(last_block_hash, nonce);
 
     const response = {
         'message': "Block baru telah ditambahkan (mined)",
