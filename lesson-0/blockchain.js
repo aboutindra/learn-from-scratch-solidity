@@ -6,7 +6,7 @@ const App = new express();
 const PORT = 3000
 
 const { createHash } = require('crypto');
-const { v4: uuidv4 } = require('uuid')
+const { v4: uuidv4 } = require('uuid');
 
 class Blockchain {
 
@@ -15,6 +15,7 @@ class Blockchain {
         this.nodes = new Set();
         this.chain = [];
         this.current_transactions = [];
+        this.hash_of_current_block = "";
         this.genesis_hash = this.hash_block("genesis_block");
         this.append_block (
             this.genesis_hash,
@@ -101,7 +102,12 @@ class Blockchain {
         let content = encodeURI(`${index}${hash_of_previous_block}${transactions}${nonce}`);
         let contentHash = createHash('sha256').update(content).digest('hex');
 
-        return (String(contentHash.substring(0, 4)) === this.difficulty_target)
+
+        if((String(contentHash.substring(0, 4)) === this.difficulty_target)){
+            this.hash_of_current_block = contentHash;
+            return true;
+        }
+        return false;
     }
 
     append_block( hash_of_previous_block, nonce ) {
@@ -110,10 +116,12 @@ class Blockchain {
             'timestamp': new Date().getTime(),
             'transaction': this.current_transactions,
             'nonce': nonce,
-            'hash_of_previous_block': hash_of_previous_block
+            'hash_of_previous_block': hash_of_previous_block,
+            'hash_of_current_block' : this.hash_of_current_block
         }
 
         this.current_transactions = [];
+        this.hash_of_current_block = "";
         this.chain.push(block);
         return block;
     }
@@ -159,7 +167,7 @@ App.get('/blockchain', (req, res) => {
 
 App.get('/mine', async(req, res) => {
     blockchain.add_transaction("0", node_identifier, 1);
-    let last_block_hash = blockchain.hash_block(blockchain.last_block());
+    let last_block_hash = blockchain.last_block().hash_of_current_block;
     let index = blockchain.chain.length;
 
     let nonce = blockchain.proof_of_work(index, last_block_hash, blockchain.current_transactions);
@@ -183,7 +191,6 @@ App.post('/transactions/new', async (req, res) => {
     let isEmpty = false;
     for(const key in [sender, recipient, amount]){
         if(key === "" || key === undefined || key === null){
-            console.log(key + " is empty.")
             isEmpty = true;
             return res.status(400)
                 .send({
