@@ -3,7 +3,7 @@ const axios = require("axios");
 const express = require('express');
 const App = new express();
 
-const PORT = 3000
+const PORT = 3000;
 
 const { createHash } = require('crypto');
 const { v4: uuidv4 } = require('uuid');
@@ -35,7 +35,7 @@ class Blockchain {
         while (current_index < chain.length){
             let block = chain[current_index];
 
-            if(block['hash_of_previous_block'] != this.hash_block(last_block)){
+            if(block['hash_of_previous_block'] !== this.hash_block(last_block)){
                 return false;
             }
 
